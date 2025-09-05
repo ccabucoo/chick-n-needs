@@ -6,7 +6,7 @@ const About = () => {
   return (
     <div className="container">
       <div className="page-header">
-        <h1>About Chick'N Needs</h1>
+        <h1>About Us - Chick'N Needs</h1>
         <p>Learn more about our story, mission, and the team behind the platform</p>
       </div>
 
@@ -50,14 +50,7 @@ const About = () => {
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <h2 style={{ marginBottom: '0.75rem', color: 'var(--primary-dark)' }}>Meet the Team</h2>
-        <p style={{ color: 'var(--gray)' }}>
-          We’re a group of student developers, designers, and agriculture enthusiasts passionate
-          about building tools that make real impact. This site is part of our capstone project,
-          developed with a Service-Oriented Architecture and modern web technologies.
-        </p>
-      </div>
+
 
       <div className="card" style={{ textAlign: 'center' }}>
         <h2 style={{ marginBottom: '0.75rem', color: 'var(--primary-dark)' }}>Get in Touch</h2>

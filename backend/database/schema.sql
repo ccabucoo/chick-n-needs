@@ -142,6 +142,21 @@ INSERT IGNORE INTO products (id, name, category_id, subcategory, price, original
 ('2', 'Layer Feed (20kg)', 2, 'Complete Feeds', 850.00, 900.00, 100, 'bag', 'Complete layer feed with balanced nutrition for egg production. Contains essential vitamins and minerals.', '{"weight": "20kg", "protein": "16%", "calcium": "3.5%", "energy": "2800 kcal/kg", "suitableFor": "Laying hens"}', '["https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400"]', '["feed", "layers", "nutrition", "eggs"]', 4.6, 89, TRUE, FALSE, TRUE, 6),
 ('3', 'Automatic Feeder', 4, 'Feeders', 1200.00, NULL, 25, 'piece', 'Automatic chicken feeder with gravity flow system. Holds up to 10kg of feed and prevents waste.', '{"capacity": "10kg", "material": "Plastic", "type": "Gravity flow", "suitableFor": "All chicken types", "installation": "Easy"}', '["https://images.unsplash.com/photo-1548550023-2bdb3c5be0e7?w=400"]', '["feeder", "automatic", "waste-prevention", "easy-install"]', 4.7, 67, FALSE, TRUE, FALSE, 0);
 
+-- Contact form submissions table
+CREATE TABLE IF NOT EXISTS contact_submissions (
+  id VARCHAR(36) PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  concern_type ENUM('general', 'product_inquiry', 'order_support', 'technical_issue', 'billing', 'partnership', 'feedback', 'complaint') NOT NULL,
+  subject VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  status ENUM('new', 'in_progress', 'resolved', 'closed') DEFAULT 'new',
+  priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+  admin_notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_price ON products(price);
@@ -152,3 +167,6 @@ CREATE INDEX idx_cart_user ON cart(user_id);
 CREATE INDEX idx_wishlist_user ON wishlist(user_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_notifications_read ON notifications(is_read);
+CREATE INDEX idx_contact_submissions_status ON contact_submissions(status);
+CREATE INDEX idx_contact_submissions_concern ON contact_submissions(concern_type);
+CREATE INDEX idx_contact_submissions_created ON contact_submissions(created_at);

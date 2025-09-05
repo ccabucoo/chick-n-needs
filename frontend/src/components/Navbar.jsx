@@ -64,7 +64,7 @@ const Navbar = () => {
               Products
             </Link>
             <Link to="/about" className="nav-link">
-              About
+              About Us
             </Link>
             <Link to="/contact" className="nav-link">
               Contact
@@ -187,7 +187,7 @@ const Navbar = () => {
                 Products
               </Link>
               <Link to="/about" className="mobile-nav-link">
-                About
+                About Us
               </Link>
               <Link to="/contact" className="mobile-nav-link">
                 Contact

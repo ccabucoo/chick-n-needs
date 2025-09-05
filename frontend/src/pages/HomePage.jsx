@@ -6,60 +6,29 @@ import { useCart } from '../contexts/CartContext';
 const HomePage = () => {
   const { user } = useAuth();
   const { addToCart, addToWishlist, isInWishlist } = useCart();
-  const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Hero slides data - Modern and engaging content
-  const heroSlides = [
-    {
-      id: 1,
-      title: "Premium Poultry Supplies",
-      subtitle: "Everything you need for successful poultry farming",
-      cta: "Shop Now",
-      link: "/products"
-    },
-    {
-      id: 2,
-      title: "Expert Farming Solutions",
-      subtitle: "Professional equipment and supplies for modern poultry operations",
-      cta: "Explore Solutions",
-      link: "/products"
-    },
-    {
-      id: 3,
-      title: "Professional Feed Solutions",
-      subtitle: "Nutritionally balanced feeds for all stages",
-      cta: "Browse Feeds",
-      link: "/products?category=Feeds%20%26%20Supplements"
-    }
-  ];
-
-  // Auto-advance hero slides
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [heroSlides.length]);
-
-  // Category data
+  // Category data with images
   const categories = [
     {
       id: 2,
       name: "Feeds & Supplements",
       description: "Complete feeds, vitamins, and minerals",
-      link: "/products?category=Feeds%20%26%20Supplements"
+      link: "/products?category=Feeds%20%26%20Supplements",
+      image: "/images/FEEDS AND SUPPLEMENTS.png"
     },
     {
       id: 3,
       name: "Equipment & Supplies",
       description: "Feeders, drinkers, and farm equipment",
-      link: "/products?category=Equipment%20%26%20Supplies"
+      link: "/products?category=Equipment%20%26%20Supplies",
+      image: "/images/EQUIPMENT AND SUPPLIES.png"
     },
     {
       id: 4,
       name: "Health & Medicine",
       description: "Vaccines, medicines, and health products",
-      link: "/products?category=Health%20%26%20Medicine"
+      link: "/products?category=Health%20%26%20Medicine",
+      image: "/images/HEALTH AND MEDICINE.png"
     }
   ];
 
@@ -90,59 +59,43 @@ const HomePage = () => {
 
   return (
     <div className="home-page">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-slider">
-          {heroSlides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className={`hero-slide slide-${index + 1} ${index === currentSlide ? 'active' : ''}`}
-            >
-              <div className="hero-content">
-                <div className="container">
-                  <h1 className="hero-title">{slide.title}</h1>
-                  <p className="hero-subtitle">{slide.subtitle}</p>
-                  <Link to={slide.link} className="btn btn-primary btn-lg">
-                    {slide.cta}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-          
-          {/* Hero Navigation Dots */}
-          <div className="hero-dots">
-            {heroSlides.map((_, index) => (
-              <button
-                key={index}
-                className={`hero-dot ${index === currentSlide ? 'active' : ''}`}
-                onClick={() => setCurrentSlide(index)}
-              />
-            ))}
-          </div>
-        </div>
+      {/* Cover Image */}
+      <section className="cover-section">
+        <img 
+          src="/images/CHICKN'N NEEDS COVER HOMEPAGE.png" 
+          alt="Chick'N Needs Cover" 
+          className="cover-image"
+        />
       </section>
 
-      {/* Welcome Section */}
-      <section className="welcome-section">
+      {/* Features Section */}
+      <section className="features-section">
         <div className="container">
-          <div className="text-center mb-5">
-            <h2 className="section-title">Welcome to Chick'N Needs</h2>
-            <p className="section-subtitle">
-              Your trusted partner for all poultry farming supplies and equipment
-            </p>
-          </div>
-          
-          <div className="welcome-features">
-            <div className="welcome-feature">
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"/>
+                </svg>
+              </div>
               <h3>Fast Delivery</h3>
               <p>Same-day delivery for Metro Manila, next-day for nearby provinces</p>
             </div>
-            <div className="welcome-feature">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
               <h3>Quality Guaranteed</h3>
-              <p>All products are sourced from trusted manufacturers and suppliers</p>
+              <p>All products sourced from trusted manufacturers and suppliers</p>
             </div>
-            <div className="welcome-feature">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m8-10a4 4 0 100-8 4 4 0 000 8zm8 0a4 4 0 100-8 4 4 0 000 8z"/>
+                </svg>
+              </div>
               <h3>Expert Support</h3>
               <p>Get advice from our experienced poultry farming specialists</p>
             </div>
@@ -153,18 +106,15 @@ const HomePage = () => {
       {/* Categories Section */}
       <section className="categories-section">
         <div className="container">
-          <div className="text-center mb-5">
-            <h2 className="section-title">Shop by Category</h2>
-            <p className="section-subtitle">
-              Find everything you need for successful poultry farming
-            </p>
+          <div className="section-header">
+            <h2>Shop by Category</h2>
           </div>
           
           <div className="categories-grid">
             {categories.map((category) => (
               <Link key={category.id} to={category.link} className="category-card">
                 <div className="category-image">
-                  <div className="category-overlay"></div>
+                  <img src={category.image} alt={category.name} />
                 </div>
                 <div className="category-content">
                   <h3>{category.name}</h3>
@@ -176,25 +126,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Products and Promotions removed as requested */}
-
-      {/* Call to Action */}
-      <section className="cta-section">
-        <div className="container text-center">
-          <h2>Ready to Start Your Poultry Farm?</h2>
-          <p>Join thousands of successful farmers who trust Chick'N Needs</p>
-          <div className="cta-buttons">
-            <Link to="/products" className="btn btn-primary btn-lg">
-              Browse Products
-            </Link>
-            {!user && (
-              <Link to="/register" className="btn btn-secondary btn-lg">
-                Create Account
-              </Link>
-            )}
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

@@ -340,7 +340,8 @@ router.post('/login', securityMiddleware, validateLogin, async (req, res) => {
       
       return res.status(401).json({
         success: false,
-        error: 'Invalid email or password',
+        error: 'Account does not exist',
+        message: 'No account found with this email address. Please check your email or create a new account.',
         remainingAttempts: SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS - attempts
       });
     }

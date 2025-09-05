@@ -17,6 +17,43 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
+  // Function to get product image based on product name/category
+  const getProductImage = (item) => {
+    const productName = item.name.toLowerCase();
+    const category = item.category.toLowerCase();
+    
+    // Map product names to images
+    if (productName.includes('broiler')) {
+      return '/images/Broiler.png';
+    } else if (productName.includes('drinker') || productName.includes('automatic')) {
+      return '/images/Automatic Poultry Drinke.png';
+    } else if (productName.includes('feeder')) {
+      return '/images/Poultry Feeder.png';
+    } else if (productName.includes('netting') || productName.includes('net')) {
+      return '/images/Poultry Netting.png';
+    } else if (productName.includes('layer') || productName.includes('mash')) {
+      return '/images/Layer Mash.png';
+    } else if (productName.includes('premix')) {
+      return '/images/Poultry Premix.png';
+    } else if (productName.includes('antibiotic')) {
+      return '/images/Poultry Antibiotic.png';
+    } else if (productName.includes('dewormer') || productName.includes('deworm')) {
+      return '/images/Poultry Dewormer.png';
+    } else if (productName.includes('vaccine')) {
+      return '/images/Poultry Vaccine.png';
+    } else {
+      // Default image based on category
+      if (category.includes('feeds')) {
+        return '/images/FEEDS AND SUPPLEMENTS.png';
+      } else if (category.includes('equipment')) {
+        return '/images/EQUIPMENT AND SUPPLIES.png';
+      } else if (category.includes('health')) {
+        return '/images/HEALTH AND MEDICINE.png';
+      }
+      return '/images/Chick\'N Needs Logo.png'; // Fallback
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -159,9 +196,7 @@ const Cart = () => {
               {cartItems.map((item) => (
                 <div key={item.productId} className="cart-item">
                   <div className="item-image">
-                    <div className="placeholder-image">
-                      🦆
-                    </div>
+                    <img src={getProductImage(item)} alt={item.name} />
                   </div>
 
                   <div className="item-details">

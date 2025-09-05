@@ -47,7 +47,7 @@ function App() {
           {/* Router enables navigation between different pages */}
           <Router>
             {/* This div is a container that holds everything */}
-            <div>
+      <div>
               {/* Navbar appears on every page at the top */}
               <Navbar />
               {/* Main content area - everything below the navbar */}
@@ -115,7 +115,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
-            </div>
+      </div>
           </Router>
         </CartProvider>
       </ProductProvider>

@@ -9,7 +9,7 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const { fetchProductById } = useProducts();
   const { addToCart, addToWishlist, isInWishlist } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,6 +17,43 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
+
+  // Function to get product image based on product name/category
+  const getProductImage = (product) => {
+    const productName = product.name.toLowerCase();
+    const category = product.category.toLowerCase();
+    
+    // Map product names to images
+    if (productName.includes('broiler')) {
+      return '/images/Broiler.png';
+    } else if (productName.includes('drinker') || productName.includes('automatic')) {
+      return '/images/Automatic Poultry Drinke.png';
+    } else if (productName.includes('feeder')) {
+      return '/images/Poultry Feeder.png';
+    } else if (productName.includes('netting') || productName.includes('net')) {
+      return '/images/Poultry Netting.png';
+    } else if (productName.includes('layer') || productName.includes('mash')) {
+      return '/images/Layer Mash.png';
+    } else if (productName.includes('premix')) {
+      return '/images/Poultry Premix.png';
+    } else if (productName.includes('antibiotic')) {
+      return '/images/Poultry Antibiotic.png';
+    } else if (productName.includes('dewormer') || productName.includes('deworm')) {
+      return '/images/Poultry Dewormer.png';
+    } else if (productName.includes('vaccine')) {
+      return '/images/Poultry Vaccine.png';
+    } else {
+      // Default image based on category
+      if (category.includes('feeds')) {
+        return '/images/FEEDS AND SUPPLEMENTS.png';
+      } else if (category.includes('equipment')) {
+        return '/images/EQUIPMENT AND SUPPLIES.png';
+      } else if (category.includes('health')) {
+        return '/images/HEALTH AND MEDICINE.png';
+      }
+      return '/images/Chick\'N Needs Logo.png'; // Fallback
+    }
+  };
 
   useEffect(() => {
     fetchProduct();
@@ -44,8 +81,53 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
+    if (!user) {
+      // Show a more user-friendly message
+      const message = 'To access this feature, you must have an account. Please sign up to continue.';
+      
+      // Create a custom notification
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideIn 0.3s ease-out;
+      `;
+      notification.textContent = message;
+      
+      // Add animation styles
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      document.body.appendChild(notification);
+      
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 4000);
+      
+      // Redirect after a short delay
+      setTimeout(() => {
+        navigate('/register');
+      }, 1000);
+      
       return;
     }
 
@@ -58,8 +140,53 @@ const ProductDetails = () => {
   };
 
   const handleAddToWishlist = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
+    if (!user) {
+      // Show a more user-friendly message
+      const message = 'To access this feature, you must have an account. Please sign up to continue.';
+      
+      // Create a custom notification
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideIn 0.3s ease-out;
+      `;
+      notification.textContent = message;
+      
+      // Add animation styles
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      document.body.appendChild(notification);
+      
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 4000);
+      
+      // Redirect after a short delay
+      setTimeout(() => {
+        navigate('/register');
+      }, 1000);
+      
       return;
     }
 
@@ -118,10 +245,10 @@ const ProductDetails = () => {
       </div>
 
       <div className="product-details-layout">
-        {/* Product Images - replaced with placeholder only */}
+        {/* Product Images */}
         <div className="product-images-section">
           <div className="main-image">
-            <div className="placeholder-image"></div>
+            <img src={getProductImage(product)} alt={product.name} className="main-image-img" />
           </div>
         </div>
 

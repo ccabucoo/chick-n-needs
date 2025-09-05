@@ -131,7 +131,10 @@ const Login = () => {
         localStorage.removeItem('loginCooldown');
         navigate(from, { replace: true });
       } else {
-        setError(result?.error || 'Login failed. Please try again.');
+        // Handle specific error messages
+        const errorMessage = result?.error || 'Login failed. Please try again.';
+        setError(errorMessage);
+        
         if (result?.lockedUntil) {
           setLockoutUntil(result.lockedUntil);
         } else {
@@ -210,7 +213,16 @@ const Login = () => {
             </div>
 
             {(error || authError) && (
-              <div className="error-message">{error || authError}</div>
+              <div className="error-message">
+                {error || authError}
+                {(error || authError) === 'Account does not exist' && (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <Link to="/register" className="auth-link" style={{ fontSize: '0.9rem' }}>
+                      Create a new account
+                    </Link>
+                  </div>
+                )}
+              </div>
             )}
 
             <button type="submit" className="btn btn-primary auth-btn" disabled={loading || !!lockoutUntil || !!cooldownUntil}>

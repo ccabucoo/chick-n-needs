@@ -50,7 +50,10 @@ export const ProductProvider = ({ children }) => {
 
           if (data.success) {
             setProducts(data.data.products);
-            setCategories(data.data.filters.categories);
+            // Set categories from backend response
+            if (data.data.filters && data.data.filters.categories) {
+              setCategories(data.data.filters.categories);
+            }
             return data.data;
           } else {
             throw new Error(data.error || 'Failed to fetch products');

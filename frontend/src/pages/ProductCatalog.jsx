@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useProducts } from '../contexts/ProductContext';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const ProductCatalog = () => {
-  const { products, loading, error, fetchProducts } = useProducts();
+  const { products, categories, loading, error, fetchProducts } = useProducts();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,11 +21,48 @@ const ProductCatalog = () => {
   const [appliedPriceRange, setAppliedPriceRange] = useState({ min: '', max: '' });
   const [isWorking, setIsWorking] = useState(false);
 
+  // Function to get product image based on product name/category
+  const getProductImage = (product) => {
+    const productName = product.name.toLowerCase();
+    const category = product.category.toLowerCase();
+    
+    // Map product names to images
+    if (productName.includes('broiler')) {
+      return '/images/Broiler.png';
+    } else if (productName.includes('drinker') || productName.includes('automatic')) {
+      return '/images/Automatic Poultry Drinke.png';
+    } else if (productName.includes('feeder')) {
+      return '/images/Poultry Feeder.png';
+    } else if (productName.includes('netting') || productName.includes('net')) {
+      return '/images/Poultry Netting.png';
+    } else if (productName.includes('layer') || productName.includes('mash')) {
+      return '/images/Layer Mash.png';
+    } else if (productName.includes('premix')) {
+      return '/images/Poultry Premix.png';
+    } else if (productName.includes('antibiotic')) {
+      return '/images/Poultry Antibiotic.png';
+    } else if (productName.includes('dewormer') || productName.includes('deworm')) {
+      return '/images/Poultry Dewormer.png';
+    } else if (productName.includes('vaccine')) {
+      return '/images/Poultry Vaccine.png';
+    } else {
+      // Default image based on category
+      if (category.includes('feeds')) {
+        return '/images/FEEDS AND SUPPLEMENTS.png';
+      } else if (category.includes('equipment')) {
+        return '/images/EQUIPMENT AND SUPPLIES.png';
+      } else if (category.includes('health')) {
+        return '/images/HEALTH AND MEDICINE.png';
+      }
+      return '/images/Chick\'N Needs Logo.png'; // Fallback
+    }
+  };
+
   // Derived flags for UI enable/disable
   const hasSearchInput = searchTerm.trim() !== '';
   const hasFilterInput = !!selectedCategory || priceRange.min !== '' || priceRange.max !== '';
-  const canApply = hasSearchInput || hasFilterInput;
-  const canClear = hasSearchInput || hasFilterInput;
+  const canApply = hasSearchInput || hasFilterInput || sortOption !== 'name';
+  const canClear = hasSearchInput || hasFilterInput || sortOption !== 'name';
 
   useEffect(() => {
     // Initial load - only fetch if no search term
@@ -49,23 +88,30 @@ const ProductCatalog = () => {
   };
 
   const handleApplyFilters = async () => {
-    if (isWorking || !canApply) return;
+    if (isWorking) return;
     setIsWorking(true);
+    
+    // Update applied filters
     setAppliedSearchTerm(searchTerm);
     setAppliedCategory(selectedCategory);
     setAppliedSortOption(sortOption);
     setAppliedPriceRange({ ...priceRange });
 
+    // Build query parameters
     const params = {};
-    if (searchTerm) params.search = searchTerm;
+    if (searchTerm.trim()) params.search = searchTerm.trim();
     if (selectedCategory) params.category = selectedCategory;
-    if (priceRange.min !== '') params.minPrice = priceRange.min;
-    if (priceRange.max !== '') params.maxPrice = priceRange.max;
+    if (priceRange.min !== '') params.minPrice = parseFloat(priceRange.min);
+    if (priceRange.max !== '') params.maxPrice = parseFloat(priceRange.max);
+    
     const { sortBy, sortOrder } = parseSort(sortOption);
     if (sortBy) params.sortBy = sortBy;
     if (sortOrder) params.sortOrder = sortOrder;
+    
     try {
       await fetchProducts(params);
+    } catch (error) {
+      console.error('Error applying filters:', error);
     } finally {
       setIsWorking(false);
     }
@@ -74,29 +120,42 @@ const ProductCatalog = () => {
   const handleClearSearch = async () => {
     setSearchTerm('');
     setAppliedSearchTerm('');
+    
+    // Keep other filters but remove search
     const params = {};
     if (selectedCategory) params.category = selectedCategory;
-    if (appliedPriceRange.min !== '') params.minPrice = appliedPriceRange.min;
-    if (appliedPriceRange.max !== '') params.maxPrice = appliedPriceRange.max;
+    if (appliedPriceRange.min !== '') params.minPrice = parseFloat(appliedPriceRange.min);
+    if (appliedPriceRange.max !== '') params.maxPrice = parseFloat(appliedPriceRange.max);
+    
     const { sortBy, sortOrder } = parseSort(sortOption);
     if (sortBy) params.sortBy = sortBy;
     if (sortOrder) params.sortOrder = sortOrder;
-    await fetchProducts(params);
+    
+    try {
+      await fetchProducts(params);
+    } catch (error) {
+      console.error('Error clearing search:', error);
+    }
   };
 
   const handleClearFilters = async () => {
-    if (isWorking || !canClear) return;
+    if (isWorking) return;
     setIsWorking(true);
+    
+    // Reset all filter states
     setSearchTerm('');
     setSelectedCategory('');
     setSortOption('name');
     setPriceRange({ min: '', max: '' });
     setAppliedSearchTerm('');
     setAppliedCategory('');
-    setAppliedSortOption('');
+    setAppliedSortOption('name');
     setAppliedPriceRange({ min: '', max: '' });
+    
     try {
       await fetchProducts();
+    } catch (error) {
+      console.error('Error clearing filters:', error);
     } finally {
       setIsWorking(false);
     }
@@ -106,13 +165,76 @@ const ProductCatalog = () => {
     // Price changes are applied via the main Apply button
   };
 
+  // Function to check if user is authenticated before performing actions
+  const requireAuth = (action) => {
+    if (!user) {
+      // Show a more user-friendly message
+      const message = 'To access this feature, you must have an account. Please sign up to continue.';
+      
+      // Create a custom notification
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideIn 0.3s ease-out;
+      `;
+      notification.textContent = message;
+      
+      // Add animation styles
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      document.body.appendChild(notification);
+      
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 4000);
+      
+      // Redirect after a short delay
+      setTimeout(() => {
+        navigate('/register');
+      }, 1000);
+      
+      return false;
+    }
+    return true;
+  };
+
   const handleAddToCart = async (productId) => {
+    if (!requireAuth('add to cart')) return;
+    
     try {
       await addToCart(productId, 1);
     } catch (err) {
       console.error('Error adding to cart:', err);
     }
   };
+
+  const handleViewDetails = (productId) => {
+    if (!requireAuth('view details')) return;
+    
+    navigate(`/products/${productId}`);
+  };
+  
 
   const handleAddToWishlist = async (productId) => {
     try {
@@ -122,13 +244,7 @@ const ProductCatalog = () => {
     }
   };
 
-  const categories = [
-    'Feeds & Supplements',
-    'Vaccines & Medicines',
-    'Equipment & Tools',
-    'Housing & Materials',
-    'Other Supplies'
-  ];
+  // Categories are now fetched from the backend via ProductContext
 
   const sortOptions = [
     { value: 'name', label: 'Name A-Z' },
@@ -165,10 +281,7 @@ const ProductCatalog = () => {
 
   return (
     <div className="container">
-      <div className="page-header">
-        <h1>Product Catalog</h1>
-        <p>Browse our complete range of poultry supplies</p>
-      </div>
+      
 
       {/* Toolbar */}
       <div className="catalog-controls">
@@ -230,7 +343,7 @@ const ProductCatalog = () => {
               className="filter-select"
             >
               <option value="">All Categories</option>
-              {categories.map(category => (
+              {categories && categories.map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </select>
@@ -298,12 +411,7 @@ const ProductCatalog = () => {
           <div className="empty-icon">🔍</div>
           <h3>No Products Found</h3>
           <p>Try adjusting your search terms or filters</p>
-          <button onClick={() => {
-            setSearchTerm('');
-            setSelectedCategory('');
-            setPriceRange({ min: '', max: '' });
-            fetchProducts();
-          }} className="btn btn-primary">
+          <button onClick={handleClearFilters} className="btn btn-primary">
             Clear Filters
           </button>
         </div>
@@ -312,6 +420,7 @@ const ProductCatalog = () => {
           {products.map((product) => (
             <div key={product.id} className={`product-card modern ${viewMode}`}>
               <div className="product-image">
+                <img src={getProductImage(product)} alt={product.name} />
                 <div className="price-badge">
                   ₱{product.price.toFixed(2)}
                 </div>
@@ -340,10 +449,16 @@ const ProductCatalog = () => {
                 </div>
 
                 <div className="product-actions-bottom">
-                  <button className="btn btn-primary add-to-cart-btn" disabled>
+                  <button 
+                    className="btn btn-primary add-to-cart-btn" 
+                    onClick={() => handleAddToCart(product.id)}
+                  >
                     Add to Cart
                   </button>
-                  <button className="btn btn-outline view-details-btn" disabled>
+                  <button 
+                    className="btn btn-outline view-details-btn"
+                    onClick={() => handleViewDetails(product.id)}
+                  >
                     View Details
                   </button>
                 </div>

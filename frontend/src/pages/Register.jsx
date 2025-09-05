@@ -24,11 +24,13 @@ const Register = () => {
   // These are state variables - they store data that can change
   // loading: tracks whether we're currently processing the registration
   // error: stores any error messages to show the user
+  // success: tracks whether registration was successful
   // cooldownUntil: tracks when the user can try registering again (for security)
   // cooldownCountdown: shows a countdown timer to the user
   // attemptLevel: tracks how many times the user has tried (for increasing delays)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState(null);
   const [cooldownCountdown, setCooldownCountdown] = useState('');
   const [attemptLevel, setAttemptLevel] = useState(0);
@@ -188,8 +190,15 @@ const Register = () => {
 
       // Check if registration was successful
       if (result.success) {
-        // If successful, redirect to the home page
-        navigate('/');
+        // If successful, show success message
+        setError(''); // Clear any previous errors
+        setSuccess(true); // Show success state
+        
+        // Redirect to login page after 3 seconds
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+        return; // Exit early to prevent showing error
       } else {
         // If failed, show the error message
         setError(result.error || 'Registration failed');
@@ -236,7 +245,7 @@ const Register = () => {
 
           {/* The actual form that collects user input */}
           {/* onSubmit={handleSubmit} means "when form is submitted, run handleSubmit function" */}
-          <form onSubmit={handleSubmit} className="auth-form">
+          <form onSubmit={handleSubmit} className="auth-form" style={{ opacity: success ? 0.6 : 1 }}>
             {/* First row: First Name and Last Name side by side */}
             <div className="form-row">
               {/* First Name input field */}
@@ -344,6 +353,14 @@ const Register = () => {
               />
             </div>
 
+            {/* Success message display - only shows when registration is successful */}
+            {success && (
+              <div className="alert alert-success" style={{ marginBottom: '1rem' }}>
+                <strong>Registration Successful!</strong><br />
+                Your account has been created. You will be redirected to the login page in a few seconds.
+              </div>
+            )}
+
             {/* Error message display - only shows when there's an error */}
             {error && (
               <div className="error-message">
@@ -357,10 +374,10 @@ const Register = () => {
               <button
                 type="submit"                                    // This button submits the form
                 className="btn btn-primary auth-btn"              // CSS styling classes
-                disabled={loading}                               // Disable button while processing
+                disabled={loading || success}                    // Disable button while processing or after success
               >
                 {/* Button text changes based on current state */}
-                {cooldownUntil ? `Wait (${cooldownCountdown || '00:02'})` : (loading ? 'Creating Account...' : 'Create Account')}
+                {success ? 'Account Created!' : (cooldownUntil ? `Wait (${cooldownCountdown || '00:02'})` : (loading ? 'Creating Account...' : 'Create Account'))}
               </button>
             </div>
           </form>

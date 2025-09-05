@@ -190,9 +190,8 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
-        setUser(data.user);
-        localStorage.setItem('chickNNeedsUser', JSON.stringify(data.user));
-        localStorage.setItem('chickNNeedsToken', data.token);
+        // Registration successful - do NOT automatically log in the user
+        // User will need to manually log in after registration
         return { success: true };
       } else {
         if (data.errors && Array.isArray(data.errors)) {

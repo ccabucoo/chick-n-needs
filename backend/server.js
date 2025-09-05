@@ -37,6 +37,7 @@ const productRoutes = require('./routes/products'); // Handles product catalog, 
 const userRoutes = require('./routes/users');       // Handles user profiles and settings
 const cartRoutes = require('./routes/cart');        // Handles shopping cart operations
 const orderRoutes = require('./routes/orders');     // Handles order processing
+const contactRoutes = require('./routes/contact');  // Handles contact form submissions
 
 // This creates our Express application - it's like creating a new web server
 const app = express();
@@ -104,6 +105,7 @@ app.use('/api/products', productRoutes);           // /api/products/* routes for
 app.use('/api/users', userRoutes);                 // /api/users/* routes for user operations
 app.use('/api/cart', cartRoutes);                  // /api/cart/* routes for shopping cart
 app.use('/api/orders', orderRoutes);               // /api/orders/* routes for order processing
+app.use('/api/contact', contactRoutes);            // /api/contact/* routes for contact form
 
 // HEALTH CHECK ENDPOINT - This lets you check if your server is running
 // It's like a heartbeat monitor for your website
